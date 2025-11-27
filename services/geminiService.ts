@@ -1,9 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MissionContent } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Aseguramos que haya un string, aunque sea vacío, para evitar error de TS en el constructor
+const apiKey = process.env.API_KEY || "";
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export const generateMissionContent = async (topic: string, ageGroup: string = "9-11 años"): Promise<MissionContent> => {
+  if (!apiKey) {
+    console.error("API_KEY no encontrada. Asegúrate de configurarla en las variables de entorno de Netlify.");
+    throw new Error("API Key missing");
+  }
+
   const model = "gemini-2.5-flash";
   
   const systemInstruction = `Eres Aristóteles, un robot guía educativo experto en historia para niños de ${ageGroup}. 
@@ -79,7 +86,7 @@ export const generateMissionContent = async (topic: string, ageGroup: string = "
 
   } catch (error) {
     console.error("Error generating mission content:", error);
-    // Fallback data
+    // Fallback data para que la app no se rompa si falla la API
     return {
       introTitle: "La Edad Antigua",
       introText: "La Edad Antigua comienza con la invención de la escritura y termina con la caída del Imperio Romano. Fue una época de grandes imperios.",
@@ -88,31 +95,31 @@ export const generateMissionContent = async (topic: string, ageGroup: string = "
         {
           text: "¿Qué evento marca el inicio de la Edad Antigua?",
           options: ["La caída de Roma", "La invención de la escritura", "El descubrimiento del fuego"],
-          correctAnswerIndex: 1, // Opción B
+          correctAnswerIndex: 1, 
           explanation: "La escritura permitió registrar la historia, separándola de la prehistoria."
         },
         {
           text: "¿Qué civilización se desarrolló entre los ríos Tigris y Éufrates?",
           options: ["Egipto", "Grecia", "Mesopotamia"],
-          correctAnswerIndex: 2, // Opción C
+          correctAnswerIndex: 2, 
           explanation: "Mesopotamia significa 'tierra entre ríos' en griego."
         },
         {
           text: "¿Cuál era la función principal de las pirámides de Egipto?",
           options: ["Eran tumbas para los faraones", "Eran palacios para vivir", "Eran templos para rezar"],
-          correctAnswerIndex: 0, // Opción A
+          correctAnswerIndex: 0, 
           explanation: "Servían para proteger el cuerpo del faraón y sus tesoros para la otra vida."
         },
         {
           text: "¿Qué sistema político nació en Atenas, Grecia?",
           options: ["La Democracia", "El Imperio", "La Teocracia"],
-          correctAnswerIndex: 0, // Opción A
+          correctAnswerIndex: 0, 
           explanation: "En Atenas los ciudadanos podían votar, dando origen a la democracia."
         },
         {
           text: "¿Qué idioma hablaban los antiguos romanos?",
           options: ["Romano", "Griego", "Latín"],
-          correctAnswerIndex: 2, // Opción C
+          correctAnswerIndex: 2, 
           explanation: "El latín es la lengua madre de idiomas como el español, francés e italiano."
         }
       ]
