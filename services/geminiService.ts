@@ -1,16 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { MissionContent } from "../types";
 
-// Aseguramos que haya un string, aunque sea vacío, para evitar error de TS en el constructor
-const apiKey = process.env.API_KEY || "";
-const ai = new GoogleGenAI({ apiKey: apiKey });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateMissionContent = async (topic: string, ageGroup: string = "9-11 años"): Promise<MissionContent> => {
-  if (!apiKey) {
-    console.error("API_KEY no encontrada. Asegúrate de configurarla en las variables de entorno de Netlify.");
-    throw new Error("API Key missing");
-  }
-
   const model = "gemini-2.5-flash";
   
   const systemInstruction = `Eres Aristóteles, un robot guía educativo experto en historia para niños de ${ageGroup}. 
